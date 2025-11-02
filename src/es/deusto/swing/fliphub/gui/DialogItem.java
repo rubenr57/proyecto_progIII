@@ -13,13 +13,13 @@ import javax.swing.border.EmptyBorder;
 
 public class DialogItem extends JDialog {
 	
-	//COnstructor del dialogo
+	//Constructor del dialogo
 	public DialogItem(JFrame parent) {
 		super(parent, "Item - Detalles", true); //parent -> la ventana; 
 												//Item - Detalles -> nombre del dialogo 
 												//true -> bloque la ventana hasta que se cierre
 		initUI();
-		this.setLocationRelativeTo(parent);//Centra el dialogo respecto a la ventana
+		this.setLocationRelativeTo(parent);//Centra el dialogo respecto a la ventana 
 	}
 	
 	//Metodo que configura el dialogo

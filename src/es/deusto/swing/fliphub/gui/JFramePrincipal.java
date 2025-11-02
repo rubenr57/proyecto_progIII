@@ -20,6 +20,7 @@ public class JFramePrincipal extends JFrame {
 
 	
 	/**
+	 * 
 	 * Ventana principal de FlipHub (esqueleto Fase 0).
 	 * - Norte: barra superior (buscar + "+ Añadir ítem")
 	 * - Oeste: menú lateral (Inventario, Ventas, Estadísticas, Import/Export)
@@ -31,7 +32,7 @@ public class JFramePrincipal extends JFrame {
 	public static final String CARD_INV = "INV";
 	public static final String CARD_VEN = "VEN";
 	public static final String CARD_EST = "EST";
-	public static final String CARD_IMP = "IMP";
+	
 	
 	
 	//Atributos(Componentes que usaremos en varios metodos)
@@ -41,6 +42,7 @@ public class JFramePrincipal extends JFrame {
 	private CardLayout cardLayout; //layout de cards
 	private JLabel statusLabel; //la barra de estados
 	private InventarioLayout inventarioPanel; //Vista del inventario
+	private VentasLayout ventasPanel; //Vista de las ventas
 	
 	//Constructor 
 	public JFramePrincipal() {
@@ -80,11 +82,11 @@ public class JFramePrincipal extends JFrame {
 		JButton btnInventario = new JButton("INVENTARIO");
 		JButton btnVentas = new JButton("VENTAS");
 		JButton btnEstadisticas = new JButton("ESTADISTICAS");
-		JButton btnImportExport = new JButton("IMPORT/EXPORT");
+		
 		
 		//Definimos un tamaño para los botones y los añadimos al menu lateral
 		Dimension navBtnSize = new Dimension(140,36);
-		for ( JButton b : new JButton[]{btnInventario,btnVentas,btnEstadisticas,btnImportExport}) {
+		for ( JButton b : new JButton[]{btnInventario,btnVentas,btnEstadisticas}) {
 			b.setPreferredSize(navBtnSize);
 			leftNav.add(b);
 		}
@@ -96,14 +98,14 @@ public class JFramePrincipal extends JFrame {
 		
 		//Paneles
 		inventarioPanel = new InventarioLayout();
-		JPanel venPanel = placeholderPanel("Ventas (WIP)");
+		ventasPanel = new VentasLayout();
         JPanel estPanel = placeholderPanel("Estadísticas (WIP)");
-        JPanel impPanel = placeholderPanel("Import/Export (WIP)");
+        
         
         cards.add(inventarioPanel, CARD_INV);
-        cards.add(venPanel, CARD_VEN);
+        cards.add(ventasPanel, CARD_VEN);
         cards.add(estPanel, CARD_EST);
-        cards.add(impPanel, CARD_IMP);
+        
         
         
         //===Barra de estados Sur===
@@ -122,7 +124,7 @@ public class JFramePrincipal extends JFrame {
         btnInventario.addActionListener(e -> showCard(CARD_INV));
         btnVentas.addActionListener(e -> showCard(CARD_VEN));
         btnEstadisticas.addActionListener(e -> showCard(CARD_EST));
-        btnImportExport.addActionListener(e -> showCard(CARD_IMP));
+        
 
 	}
 	

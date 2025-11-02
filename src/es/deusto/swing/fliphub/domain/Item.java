@@ -3,6 +3,7 @@ package es.deusto.swing.fliphub.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 
+
 public class Item {
 	
 	//ID unico para cada item

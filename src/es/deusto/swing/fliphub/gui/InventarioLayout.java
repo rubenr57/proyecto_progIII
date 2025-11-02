@@ -27,7 +27,7 @@ import javax.swing.table.TableRowSorter;
 import es.deusto.swing.fliphub.domain.Estado;
 import es.deusto.swing.fliphub.domain.Item;
 
-//Este panel sera la vista del inventari en el cardlayout
+//Este panel sera la vista del inventario en el cardlayout
 public class InventarioLayout extends JTable {
 	
 	//Componentes que iremos rellenando
@@ -184,7 +184,7 @@ public class InventarioLayout extends JTable {
 			//Comfirmacion antes de eliminar
 			int confirm = JOptionPane.showConfirmDialog(
 					this,
-					"Estas seguro de que quieres elimnar el item" + 
+					"Estas seguro de que quieres elimnar el item " + 
 					model.getValueAt(modelRow, 1) + "?",
 					"Confirmar eliminacion",
 					JOptionPane.YES_NO_OPTION
