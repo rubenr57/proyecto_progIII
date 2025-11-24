@@ -26,6 +26,7 @@ import javax.swing.table.TableRowSorter;
 
 import es.deusto.swing.fliphub.domain.Estado;
 import es.deusto.swing.fliphub.domain.Item;
+import es.deusto.swing.fliphub.domain.Sale;
 
 //Este panel sera la vista del inventario en el cardlayout
 public class InventarioLayout extends JTable {
@@ -34,6 +35,9 @@ public class InventarioLayout extends JTable {
 	private JTable table;	//la tabla
 	private DefaultTableModel model;	//modelo de datos de la tabla
 	private TableRowSorter<DefaultTableModel> sorter; //para ordenar/filtrar
+	//Setter para guardar la referencia de la venta
+	private VentasLayout ventasref;
+	public void setVentasLayoutRef(VentasLayout v) {this.ventasref = v; }
 	
 	//Datos de ejemplo 
 	private final List<Item> datos = new ArrayList();
@@ -52,8 +56,19 @@ public class InventarioLayout extends JTable {
 		
 		//Modelo de la tabla, define columnas y tipos
 		model = new DefaultTableModel(
-				new Object[] {"ID", "Nombre", "Categoría", "Estado", "Compra €", "Fecha compra", "Ubicación"},
-				0 //0 filas inciales, ahora las añadiremos
+				new Object[]{
+				        "ID",            // 0
+				        "Nombre",        // 1
+				        "Categoría",     // 2
+				        "Estado",        // 3
+				        "Compra €",      // 4
+				        "Fecha compra",  // 5
+				        "Ubicación",     // 6
+				        "Beneficio €",   // 7
+				        "ROI %"          // 8
+				    },
+				    0
+
 		) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return false;
@@ -63,6 +78,8 @@ public class InventarioLayout extends JTable {
 		        return switch (columnIndex) {
 		          	case 0 -> Long.class;   // ID
 		            case 4 -> Double.class; // Compra €
+		            case 7 -> Double.class; //Beneficio €
+		            case 8 -> Double.class; //ROI %
 		            default -> String.class;
 		        };
 			
@@ -78,7 +95,9 @@ public class InventarioLayout extends JTable {
 		            it.getEstado().name(),              // mostramos el enum como texto
 		            it.getPrecioCompra(),
 		            DF.format(it.getFechaCompra()),     // LocalDate -> texto "dd/MM/yyyy"
-		            it.getUbicacion()
+		            it.getUbicacion(),
+		            null,								//Beneficio aun sin vender
+		            null								//ROI aun sin vender
 		    });
 		}
 		
@@ -107,18 +126,58 @@ public class InventarioLayout extends JTable {
 				table.getTableHeader().getFont().deriveFont(Font.BOLD, 10f)
 				);
 		
+		//Renderer para dejar los numeros con 2 decimales
+		DefaultTableCellRenderer num2dec = new DefaultTableCellRenderer() {
+			@Override
+			protected void setValue(Object value) {
+				if ( value == null){
+					this.setText("");
+				} else if ( value instanceof Number) {
+					this.setText(String.format("%.2f", ((Number) value).doubleValue()));
+				} else {
+					this.setText(value.toString());
+				}
+				this.setHorizontalAlignment(SwingConstants.CENTER);
+			}
+			
+		};
+		
+		//Aplicamos el nuevo renderer de 2 decimales a Compra, Beneficio Y ROI
+		table.getColumnModel().getColumn(4).setCellRenderer(num2dec);
+		table.getColumnModel().getColumn(7).setCellRenderer(num2dec);
+		table.getColumnModel().getColumn(8).setCellRenderer(num2dec);
+		
 		//Botonera de acciones de la tabla en la parte inferior
 		JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT,8,0));
 		JButton btnañadir = new JButton("Añadir");
 		JButton btneditar = new JButton("Editar");
 		JButton btneliminar = new JButton("Eliminar");
+		JButton btnVender = new JButton("Vender");
 		actions.add(btnañadir);
 		actions.add(btneditar);
 		actions.add(btneliminar);
+		actions.add(btnVender);
 		
-		//De momento solo mostramos mensajes imformativos
+		//Listeners de los botones
 		btnañadir.addActionListener(e -> {
-			new DialogItem((JFrame) SwingUtilities.getWindowAncestor(this)).setVisible(true);
+			JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+			DialogItem dlg = new DialogItem(parent);
+			dlg.setVisible(true);
+			Item it = dlg.getResult();
+			if (it != null) {
+				// Añadir fila al modelo ahora tienemos 9 columnas
+		        model.addRow(new Object[]{
+		                it.getID(),
+		                it.getNombre(),
+		                it.getCategoria(),
+		                it.getEstado().name(),
+		                it.getPrecioCompra(),
+		                DF.format(it.getFechaCompra()),
+		                it.getUbicacion(),
+		                null, // Beneficio
+		                null  // ROI
+		        });
+			}
 		});
 		
 		btneditar.addActionListener(e -> {
@@ -142,26 +201,40 @@ public class InventarioLayout extends JTable {
 			long id = (long) model.getValueAt(modelRow, 0);
 			String nombre = (String) model.getValueAt(modelRow, 1);
 			String categoria = (String) model.getValueAt(modelRow, 2);
-			String estado = (String) model.getValueAt(modelRow, 3);
+			Estado estado = Estado.valueOf((String) model.getValueAt(modelRow, 3));
 			double precioCompra = (double) model.getValueAt(modelRow, 4);
-			String fechaCompra = (String) model.getValueAt(modelRow, 5);
+			java.time.LocalDate fechaCompra = java.time.LocalDate.parse(
+		            (String) model.getValueAt(modelRow, 5),
+		            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")
+		    );
 			String ubicacion = (String) model.getValueAt(modelRow, 6);
 			
-			//Mensaje con los datos del item 
-			JOptionPane.showMessageDialog(
-					this,
-					"EDITAR ITEM\n\n" +
-							"ID: " + id + "\n" +
-							"Nombre: " + nombre + "\n" +
-							"Categoria: " + categoria + "\n" +
-							"Estado: " + estado + "\n" +
-							"Precio Compra: " + precioCompra + "\n" +
-							"Fecha Compra: " + fechaCompra + "\n" +
-							"Ubicacion: " + ubicacion,
-					"INFO del Item seleccionado.",
-					JOptionPane.INFORMATION_MESSAGE
-					);
+			//Conseguimos el item actual
+			Item actual = new Item(id, nombre, categoria, estado, precioCompra, fechaCompra, ubicacion);
 			
+			//Abrimos el dialogo en modo edicion
+			JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);		
+			DialogItem dlg = new DialogItem(parent, actual);
+			dlg.setVisible(true);
+			Item mod = dlg.getResult();
+			
+			if (mod != null) {
+				//Actualizamos la fila con los nuevos datos
+				model.setValueAt(mod.getNombre(), modelRow, 1);
+				model.setValueAt(mod.getCategoria(), modelRow, 2);
+				model.setValueAt(mod.getEstado().name(), modelRow, 3);
+				model.setValueAt(mod.getPrecioCompra(), modelRow, 4);
+				model.setValueAt(mod.getFechaCompra()
+						.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 
+						modelRow, 5);
+				model.setValueAt(mod.getUbicacion(), modelRow, 6);
+				
+				//Si el estado se cambia a EN_STOCK, limpia el Beneficio y el ROI
+				if (mod.getEstado() != Estado.VENDIDO) {
+					model.setValueAt(null, modelRow, 7); //Beneficio
+					model.setValueAt(null, modelRow, 8); //ROI
+				}
+			}
 		});
 		
 		btneliminar.addActionListener(e -> {
@@ -192,6 +265,51 @@ public class InventarioLayout extends JTable {
 			
 			if (confirm == JOptionPane.YES_OPTION) {
 				model.removeRow(modelRow);
+			}
+		});
+		
+		btnVender.addActionListener(e -> {
+			int selected = table.getSelectedRow();
+			if (selected == -1 ) {
+				JOptionPane.showMessageDialog(
+						this,
+						"Selecciona un item que quieras vender.",
+						"Aviso",
+						JOptionPane.WARNING_MESSAGE
+						);
+				return;
+			}
+			
+			//Convertimos indice de vista a indice de modelo por si hay filtros
+			int modelRow = table.convertRowIndexToModel(selected);
+			
+			//Leemos el item de la columna 0 que es el ID
+			long itemID = (long) model.getValueAt(modelRow, 0);
+			
+			//Abrimos el dialogo con el item pre-rellenado
+			JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+			DialogVenta dlg = new DialogVenta(parent, itemID);
+			dlg.setVisible(true);
+			
+			//Recuperamos el resultado
+			Sale s = dlg.getResult();
+			if ( s != null) {
+				//Añadimos la venta a Ventas
+				if ( ventasref != null) {
+					ventasref.addVenta(s);
+				}
+				//Cambiar el estado del item a Vendido
+				model.setValueAt("VENDIDO", modelRow, 3);
+				
+				//Calculo de Beneficio y ROI
+				double precioCompra = ((Number) model.getValueAt(modelRow, 4)).doubleValue(); 
+				double beneficio = s.getPrecioVenta() - (precioCompra + s.getComisiones() +s.getEnvio() + s.getImpuestos());
+				Double roi = (precioCompra > 0) ? (beneficio / precioCompra) * 100.0 : null;
+				
+				//Escribir los datos en las columnas
+				model.setValueAt(beneficio, modelRow, 7);
+				model.setValueAt(roi, modelRow, 8);
+
 			}
 		});
 		

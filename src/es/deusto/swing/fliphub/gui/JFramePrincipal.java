@@ -97,8 +97,9 @@ public class JFramePrincipal extends JFrame {
 		cards.setBorder(new EmptyBorder(12,8,12,12));
 		
 		//Paneles
-		inventarioPanel = new InventarioLayout();
 		ventasPanel = new VentasLayout();
+		inventarioPanel = new InventarioLayout();
+		inventarioPanel.setVentasLayoutRef(ventasPanel);
         JPanel estPanel = placeholderPanel("Estadísticas (WIP)");
         
         

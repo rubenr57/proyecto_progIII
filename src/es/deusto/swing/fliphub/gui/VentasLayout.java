@@ -134,9 +134,38 @@ public class VentasLayout extends JTable {
 		btnNueva.addActionListener(e -> {
 			DialogVenta dlg = new DialogVenta((JFrame) SwingUtilities.getWindowAncestor(this));
 			dlg.setVisible(true);
+			Sale s = dlg.getResult();
+			if (s!= null ) {
+				//Añadimos a la tabla
+				s.getId();
+				s.getItemID();
+				DF.format(s.getFechaVenta());
+				s.getBeneficio();
+				s.getEnvio();
+				s.getCanal().name();
+				s.getPrecioVenta();
+				s.getImpuestos();
+				s.getComisiones();
+			}
 		});
 		this.add(actions, BorderLayout.SOUTH);
 	}
 	
+	//Añadir una venta desde fuera(Inventario por ejemplo)
+	public void addVenta(Sale s) {
+	    if (s == null) return;
+	    model.addRow(new Object[]{
+	        s.getId(),                       // "ID"
+	        s.getItemID(),                   // "ItemId"  (ojo: getItemId, no getItemID)
+	        DF.format(s.getFechaVenta()),    // "Fecha"
+	        s.getCanal().name(),             // "Canal"
+	        s.getPrecioVenta(),              // "Precio"
+	        s.getComisiones(),               // "Comisiones"
+	        s.getEnvio(),                    // "Envío"
+	        s.getImpuestos(),                // "Impuestos"
+	        s.getBeneficio()                 // "Beneficio"
+	    });
+	}
+		
 
 }
