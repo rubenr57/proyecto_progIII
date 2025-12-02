@@ -1,6 +1,9 @@
 package es.deusto.swing.fliphub.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.time.LocalDate;
@@ -20,15 +23,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 
 import es.deusto.swing.fliphub.domain.Canal;
 import es.deusto.swing.fliphub.domain.Sale;
 
-//Este panel sera la vista de las ventas en el cardlayout
+//Este panel va a seer la vista de las ventas en el cardlayout
 public class VentasLayout extends JTable {
 	
-	//Componenentes que iremos rellenando
+	//Componenentes que vamos a rellenar
 	private JTable table; //la tabla
 	private DefaultTableModel model; //modelo de datos da la tabla
 	private TableRowSorter<DefaultTableModel> sorter; //para ordenar/filtrar
@@ -39,9 +43,12 @@ public class VentasLayout extends JTable {
 	//Formato de fecha
 	private DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
+	//Campo para detectar si la fila esta seleccionada
+	private int hoverRow = -1;
+	
 	//Constructor
 	public VentasLayout() {
-		//Usamos BorderLayout para poder colocar la tabla en el CENTER y botones en el SOUTH
+		//BorderLayout para poder colocar la tabla en el CENTER y botones en el SOUTH
 		this.setLayout(new BorderLayout(8,8));
 		//Margen interno para que la vista no se pegue a los bordes
 		this.setBorder(new EmptyBorder(8,8,8,8));
@@ -58,7 +65,7 @@ public class VentasLayout extends JTable {
 	
 	//Datos de ejemplo
 	private void seed() {
-		//Ventas que se alimentaran desde inventario
+		//Ventas que se rellenaran desde inventario
 		 datos.add(new Sale(1, 2, LocalDate.now().minusDays(3),  Canal.WALLAPOP, 25.0, 2.0, 1.9, 0.0));
 	        datos.add(new Sale(2, 1, LocalDate.now().minusDays(15), Canal.VINTED,   60.0, 6.0, 3.5, 0.0));
 	}
@@ -75,6 +82,7 @@ public class VentasLayout extends JTable {
 			} 	
 			@Override public Class<?> getColumnClass(int c) {
 				// Esto ayuda a ordenar/representar bien cada columna
+				//Uso de IAGenerativa
                 	return switch (c) {
                     	case 0,1 -> Long.class;
                     	case 4,5,6,7,8 -> Double.class;
@@ -83,7 +91,7 @@ public class VentasLayout extends JTable {
                 }
 			};
 			
-			//Cargamos los datos en el modelo
+			//Carga los datos en el modelo
 			for (Sale s : datos) {
 				model.addRow( new Object[] {
 						s.getId(),
@@ -99,32 +107,100 @@ public class VentasLayout extends JTable {
 			}
 		}
 	
-	//Creamos JTable y sorter
+	//Crea JTable y sorter
 	private void buildTable() {
-		table = new JTable(model);
+		table = new JTable(model) {
+			@Override
+			public Component prepareRenderer(javax.swing.table.TableCellRenderer r, int row, int column) {
+				Component c = super.prepareRenderer(r, row, column);
+				//Si la fila no esta seleccionada decidimos si poner hover o zebra
+				if(!isRowSelected(row)) {
+					if( row == hoverRow) {
+						c.setBackground(getSelectionBackground());
+						c.setForeground(getSelectionForeground());
+					} else {
+						c.setBackground((row % 2 == 0) ? Color.WHITE : new Color(247, 250, 252) );
+						c.setForeground(Color.DARK_GRAY);
+					}
+				}
+				return c;
+			}
+		};
+		
+		//Listeners para el hoverRow
+		table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(java.awt.event.MouseEvent e) {
+				int r = table.rowAtPoint(e.getPoint());
+				if (r != hoverRow) {
+					hoverRow = r;
+					table.repaint();
+				}
+			}
+		});
+		table.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseExited(java.awt.event.MouseEvent e) {
+				hoverRow = -1;
+				table.repaint();
+			}
+		});
 		sorter = new TableRowSorter<DefaultTableModel>(model);
 		table.setRowSorter(sorter);
 		table.setFillsViewportHeight(true);
 		table.setAutoCreateRowSorter(true);
+		table.setRowHeight(26);
+		table.setShowHorizontalLines(true);
+		table.setShowVerticalLines(false);
+		table.setGridColor(new Color(230, 235, 240));
+		table.setIntercellSpacing(new Dimension(0,1));
+		table.setSelectionBackground(new Color(187, 222, 251));
+		table.setSelectionForeground(Color.BLACK);
 		
-		//Centramos las celdas
+		//Centra las celdas
 		DefaultTableCellRenderer center = new DefaultTableCellRenderer();
 		center.setHorizontalAlignment(SwingConstants.CENTER);
 		for ( int i = 0; i < table.getColumnCount(); i++) {
 			table.getColumnModel().getColumn(i).setCellRenderer(center);
 		}
 		
-		//Centramos la cabecera
+		//Estilo de la cabecera
+				JTableHeader header = table.getTableHeader();
+
+				// Crea un nuevo renderer para la cabecera
+				DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
+				    @Override
+				    public Component getTableCellRendererComponent(
+				            JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
+				        JLabel lbl = (JLabel) super.getTableCellRendererComponent(
+				                table, value, isSelected, hasFocus, row, column);
+
+				        lbl.setHorizontalAlignment(SwingConstants.CENTER);
+				        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 12f));
+				        lbl.setBackground(new Color(47, 79, 79)); 
+				        lbl.setForeground(Color.WHITE);
+				        lbl.setOpaque(true); 
+				        return lbl;
+				    }
+				};
+
+				// Aplica este renderer a todas las columnas de la cabecera
+				for (int i = 0; i < table.getColumnModel().getColumnCount(); i++) {
+				    table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+				}
+		
+		//Centra la cabecera
 		((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);	
 		
 		this.add(new JScrollPane(table), BorderLayout.CENTER);
-		//Hacemos el texto de la cabecera mas grande y en negrita
+		//Hace el texto de la cabecera mas grande y en negrita
 		table.getTableHeader().setFont(
 			table.getTableHeader().getFont().deriveFont(Font.BOLD, 10f)
 		);
 	}
 	
-	//Creamos el boton de "Nueva Venta"
+	//Crea el boton de "Nueva Venta"
 	private void buildActions() {
 		JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
 		JButton btnNueva = new JButton("Nueva Venta");
@@ -134,9 +210,42 @@ public class VentasLayout extends JTable {
 		btnNueva.addActionListener(e -> {
 			DialogVenta dlg = new DialogVenta((JFrame) SwingUtilities.getWindowAncestor(this));
 			dlg.setVisible(true);
+			Sale s = dlg.getResult();
+			if (s!= null ) {
+				//Añade a la tabla
+				s.getId();
+				s.getItemID();
+				DF.format(s.getFechaVenta());
+				s.getBeneficio();
+				s.getEnvio();
+				s.getCanal().name();
+				s.getPrecioVenta();
+				s.getImpuestos();
+				s.getComisiones();
+			}
 		});
 		this.add(actions, BorderLayout.SOUTH);
 	}
 	
+	//Añadir una venta desde fuera(Inventario por ejemplo)
+	public void addVenta(Sale s) {
+	    if (s == null) return;
+	    model.addRow(new Object[]{
+	        s.getId(),                       // "ID"
+	        s.getItemID(),                   // "ItemId"  (ojo: getItemId, no getItemID)
+	        DF.format(s.getFechaVenta()),    // "Fecha"
+	        s.getCanal().name(),             // "Canal"
+	        s.getPrecioVenta(),              // "Precio"
+	        s.getComisiones(),               // "Comisiones"
+	        s.getEnvio(),                    // "Envío"
+	        s.getImpuestos(),                // "Impuestos"
+	        s.getBeneficio()                 // "Beneficio"
+	    });
+	}
+	
+	//Metodo para que EstadisticasLayout pueda leer los datos
+	public javax.swing.table.DefaultTableModel getModel(){
+		return model;
+	}
 
 }

@@ -76,7 +76,7 @@ public class Sale {
 	
 	//Derivados utiles
 	public double getBeneficio() {
-		return precioVenta - comisiones - envio - impuestos;
+		return precioVenta - comisiones - envio - impuestos ;
 	}
 
 	@Override
