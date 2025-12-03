@@ -27,8 +27,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableRowSorter;
 
-
-
 import es.deusto.swing.fliphub.domain.Estado;
 import es.deusto.swing.fliphub.domain.Item;
 import es.deusto.swing.fliphub.domain.Sale;
@@ -45,7 +43,7 @@ public class InventarioLayout extends JTable {
 	public void setVentasLayoutRef(VentasLayout v) {this.ventasref = v; }
 	
 	//Datos de ejemplo 
-	private final List<Item> datos = new ArrayList();
+	private final List<Item> datos = new ArrayList<>();
 	
 	//Formato de fecha
 	private final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -80,8 +78,8 @@ public class InventarioLayout extends JTable {
 		) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return true;
-		}
-		@Override public Class<?> getColumnClass(int columnIndex) {
+			}
+			@Override public Class<?> getColumnClass(int columnIndex) {
 		        // Esto ayuda a ordenar/representar bien cada columna
 				//Uso de IAGenerativa
 		        return switch (columnIndex) {
@@ -197,8 +195,6 @@ public class InventarioLayout extends JTable {
 		table.setSelectionBackground(new Color(187, 222, 251));
 		table.setSelectionForeground(Color.BLACK);
 		
-		
-		
 		//Renderer para dejar los numeros con 2 decimales
 		DefaultTableCellRenderer num2dec = new DefaultTableCellRenderer() {
 			@Override
@@ -212,10 +208,9 @@ public class InventarioLayout extends JTable {
 				}
 				this.setHorizontalAlignment(SwingConstants.CENTER);
 			}
-			
 		};
 		
-		//Aplica el nuevo renderer de 2 decimales a Compra, Beneficio Y ROI
+		//Aplicamos el nuevo renderer de 2 decimales a Compra, Beneficio Y ROI
 		table.getColumnModel().getColumn(4).setCellRenderer(num2dec);
 		table.getColumnModel().getColumn(7).setCellRenderer(num2dec);
 		table.getColumnModel().getColumn(8).setCellRenderer(num2dec);
@@ -238,7 +233,7 @@ public class InventarioLayout extends JTable {
 			dlg.setVisible(true);
 			Item it = dlg.getResult();
 			if (it != null) {
-				// Añadir fila al modelo ahora tienemos 9 columnas
+				// Añadir fila al modelo ahora tenemos 9 columnas
 		        model.addRow(new Object[]{
 		                it.getID(),
 		                it.getNombre(),
@@ -268,7 +263,7 @@ public class InventarioLayout extends JTable {
 			}
 			
 			//Convierte indice de vista a indice de modelo, por si hay filtro
-			int modelRow = table.convertColumnIndexToModel(selectedRow);
+			int modelRow = table.convertRowIndexToModel(selectedRow);
 			
 			//Recupera los valores de esa fila
 			long id = (long) model.getValueAt(modelRow, 0);
@@ -282,17 +277,17 @@ public class InventarioLayout extends JTable {
 		    );
 			String ubicacion = (String) model.getValueAt(modelRow, 6);
 			
-			//Consigue el item actual
+			//Conseguimos el item actual
 			Item actual = new Item(id, nombre, categoria, estado, precioCompra, fechaCompra, ubicacion);
 			
-			//Abre el dialogo en modo edicion
+			//Abrimos el dialogo en modo edicion
 			JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);		
 			DialogItem dlg = new DialogItem(parent, actual);
 			dlg.setVisible(true);
 			Item mod = dlg.getResult();
 			
 			if (mod != null) {
-				//Actualiza la fila con los nuevos datos
+				//Actualizamos la fila con los nuevos datos
 				model.setValueAt(mod.getNombre(), modelRow, 1);
 				model.setValueAt(mod.getCategoria(), modelRow, 2);
 				model.setValueAt(mod.getEstado().name(), modelRow, 3);
@@ -353,21 +348,21 @@ public class InventarioLayout extends JTable {
 				return;
 			}
 			
-			//Convierte indice de vista a indice de modelo por si hay filtros
+			//Convertimos indice de vista a indice de modelo por si hay filtros
 			int modelRow = table.convertRowIndexToModel(selected);
 			
-			//Lee el item de la columna 0 que es el ID
+			//Leemos el item de la columna 0 que es el ID
 			long itemID = (long) model.getValueAt(modelRow, 0);
 			
-			//Abre el dialogo con el item pre-rellenado
+			//Abrimos el dialogo con el item pre-rellenado
 			JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 			DialogVenta dlg = new DialogVenta(parent, itemID);
 			dlg.setVisible(true);
 			
-			//Recupera el resultado
+			//Recuperamos el resultado
 			Sale s = dlg.getResult();
 			if ( s != null) {
-				//Añade la venta a Ventas
+				//Añadimos la venta a Ventas
 				if ( ventasref != null) {
 					ventasref.addVenta(s);
 				}
@@ -386,7 +381,7 @@ public class InventarioLayout extends JTable {
 			}
 		});
 		
-		//Añade la tabla creada y los botones a la vista
+		//Añadimos la tabla creada y los botones a la vista
 		this.add(new JScrollPane(table), BorderLayout.CENTER); //la tabla centrada
 		this.add(actions, BorderLayout.SOUTH); //los botones abajo
 		

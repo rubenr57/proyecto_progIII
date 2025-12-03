@@ -14,7 +14,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -38,10 +37,9 @@ public class JFramePrincipal extends JFrame {
 	public static final String CARD_EST = "EST";
 	
 	
-	
 	//Atributos(Componentes que se usan en varios metodos)
 	private JTextField txtBuscar; //Barra para buscar
-	private JButton btnAñadirItem; //Boton para añadir item
+	private JButton btnAñadirItem; //Boton para añadir item (no usado aún)
 	private JPanel cards; //contenedor en el centro con CardLayout
 	private CardLayout cardLayout; //layout de cards
 	private JLabel statusLabel; //la barra de estados
@@ -73,9 +71,7 @@ public class JFramePrincipal extends JFrame {
 		txtBuscar = new JTextField();
 		txtBuscar.setToolTipText("Buscador");
 		
-		
 		topBar.add(txtBuscar, BorderLayout.CENTER);
-		
 		
 		//Menu Lateral Oeste
 		JPanel leftNav = new JPanel();
@@ -86,7 +82,6 @@ public class JFramePrincipal extends JFrame {
 		JButton btnInventario = makeNavButton("Inventario", "icons/inventory.png");
 		JButton btnVentas = makeNavButton("Ventas", "icons/sales.png");
 		JButton btnEstadisticas = makeNavButton("Estasisticas", "icons/stats.png");
-		
 		
 		//Define un tamaño para los botones y los añadimos al menu lateral
 		Dimension navBtnSize = new Dimension(140,36);
@@ -110,15 +105,12 @@ public class JFramePrincipal extends JFrame {
         cards.add(ventasPanel, CARD_VEN);
         cards.add(estadisticasPanel, CARD_EST);
         
-       
         // Refrescar estadísticas cuando cambien ventas o inventario
         ventasPanel.getModel().addTableModelListener(e -> estadisticasPanel.refresh());
         inventarioPanel.getModel().addTableModelListener(e -> estadisticasPanel.refresh());
         
         // Primer cálculo al arrancar
         estadisticasPanel.refresh();
-        
-        
         
         //Barra de estados Sur
         JPanel statusBar = new JPanel(new BorderLayout());
@@ -136,8 +128,6 @@ public class JFramePrincipal extends JFrame {
         btnInventario.addActionListener(e -> showCard(CARD_INV));
         btnVentas.addActionListener(e -> showCard(CARD_VEN));
         btnEstadisticas.addActionListener(e -> showCard(CARD_EST));
-        
-
 	}
 	
 	//METODO BINDSACTIONS -> CONECTAR ACCIONES 
@@ -165,7 +155,7 @@ public class JFramePrincipal extends JFrame {
 		return txtBuscar.getText();
 	}
 	
-	//Crea un panel simple de marcador de posicion
+	//Crea un panel simple de marcador de posicion (por si lo necesitas en el futuro)
 	private JPanel placeholderPanel(String title) {
 		JPanel p = new JPanel(new BorderLayout());
 		JLabel lbl = new JLabel(title, SwingConstants.CENTER);
@@ -216,7 +206,7 @@ public class JFramePrincipal extends JFrame {
 			public void mouseExited(java.awt.event.MouseEvent e) {
 				b.setText("");
 				b.setIcon(icono);
-				b.setOpaque(false 	);
+				b.setOpaque(false);
 			}
 		});
 		return b;

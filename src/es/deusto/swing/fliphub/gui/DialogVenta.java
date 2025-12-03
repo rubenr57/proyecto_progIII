@@ -6,8 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.JobAttributes;
-import java.util.concurrent.Flow;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,10 +22,10 @@ import javax.swing.border.EmptyBorder;
 import es.deusto.swing.fliphub.domain.Canal;
 import es.deusto.swing.fliphub.domain.Sale;
 
-//Dialogo para añadir una venta
+// Dialogo para añadir una venta
 public class DialogVenta extends JDialog{
 	
-	//Campos del formulario 
+	// Campos del formulario 
 	private JTextField txtItemId;
 	private JTextField txtFecha;
 	private JComboBox<Canal> cbCanal;
@@ -36,39 +34,39 @@ public class DialogVenta extends JDialog{
 	private JFormattedTextField txtEnvio;
 	private JFormattedTextField txtImpuestos;
 	
-	//Estado del resultado
-	private Sale result;   //Si el usuario guarda correctamente, guardamos aqui la venta
+	// Estado del resultado
+	private Sale result;   // Si el usuario guarda correctamente, guardamos aqui la venta
 	
-	//Constructor para el item pre-rellenado seleccionado de Inventario
+	// Constructor para el item pre-rellenado seleccionado de Inventario
 	public DialogVenta(JFrame parent, long itemIdPreset) {
-		this(parent); //Llama al constructor principal que hace InitUI y pone valores por defecto
-		this.txtPrecio.setText(String.valueOf(itemIdPreset)); //Sobreescribe el campo item ID	
-		this.txtItemId.setEditable(false); //Para evitar incoherncias
+		this(parent); // Llama al constructor principal que hace InitUI y pone valores por defecto
+		this.txtPrecio.setText(String.valueOf(itemIdPreset)); // Sobreescribe el campo item ID	
+		this.txtItemId.setEditable(false); // Para evitar incoherncias
 	}
 	
 	
-	//Constructor
+	// Constructor
 	public DialogVenta(JFrame parent) {
-		super(parent, "Registrar venta", true); //parent -> la ventana; 
-												//Item - Detalles -> nombre del dialogo 
-												//true -> bloque la ventana hasta que se cierre
+		super(parent, "Registrar venta", true); // parent -> la ventana; 
+												// Item - Detalles -> nombre del dialogo 
+												// true -> bloque la ventana hasta que se cierre
 		initUI();
 		this.setLocationRelativeTo(parent);
 		
-		//Valores iniciales
-			this.txtItemId.setText("1");
-			this.txtFecha.setText(java.time.LocalDate.now()
-		       .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-			this.cbCanal.setSelectedItem(Canal.WALLAPOP);
-			this.txtPrecio.setValue(25.0);
-			this.txtComisiones.setValue(2.0);
-			this.txtEnvio.setValue(1.9);
-			this.txtImpuestos.setValue(0.0);
+		// Valores iniciales
+		this.txtItemId.setText("1");
+		this.txtFecha.setText(java.time.LocalDate.now()
+	       .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+		this.cbCanal.setSelectedItem(Canal.WALLAPOP);
+		this.txtPrecio.setValue(25.0);
+		this.txtComisiones.setValue(2.0);
+		this.txtEnvio.setValue(1.9);
+		this.txtImpuestos.setValue(0.0);
 					
 	}
 	
-	//Metodo que congigura el dialogo
-	//Uso de IAGenerativa
+	// Metodo que congigura el dialogo
+	// Uso de IAGenerativa
 	private void initUI() {
 		
 		this.setLayout(new BorderLayout(8,8));
@@ -76,7 +74,7 @@ public class DialogVenta extends JDialog{
 		this.setMinimumSize(new Dimension(480,320));
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
-		//Panel con GridBag
+		// Panel con GridBag
 		JPanel form = new JPanel(new GridBagLayout());
 		form.setBorder(new EmptyBorder(12,12,12,12));
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -85,44 +83,44 @@ public class DialogVenta extends JDialog{
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.weightx = 1;
 		
-		//Fila 0 : Item ID
+		// Fila 0 : Item ID
 		gbc.gridx = 0; gbc.gridy = 0; form.add(new JLabel("Item ID: "), gbc);
 		gbc.gridx = 1;
 		this.txtItemId = new JTextField();
 		form.add(this.txtItemId, gbc);
 		
-		//Fila 1 : Fecha(dd/MM/yyyy)
+		// Fila 1 : Fecha(dd/MM/yyyy)
 		gbc.gridx = 0; gbc.gridy = 1; form.add( new JLabel("Fecha: "), gbc);
 		gbc.gridx = 1;
 		txtFecha = new JTextField();
 		txtFecha.setToolTipText("Ej.: 03/11/2025");
 		form.add(this.txtFecha, gbc);
 		
-		//Fila 2 : Canal
+		// Fila 2 : Canal
 		gbc.gridx = 0; gbc.gridy = 2; form.add(new JLabel("Canal: "), gbc);
 		gbc.gridx = 1;
 		cbCanal = new JComboBox<Canal>(Canal.values());
 		form.add(this.cbCanal, gbc);
 		
-		//Fila 3 : Precio Venta
+		// Fila 3 : Precio Venta
 		gbc.gridx = 0; gbc.gridy = 3; form.add(new JLabel("Precio Venta: "), gbc);
 		gbc.gridx = 1;
 		txtPrecio = numberField();
 		form.add(this.txtPrecio, gbc);
 		
-		//Fila 4 : Comisiones
+		// Fila 4 : Comisiones
 		gbc.gridx = 0; gbc.gridy = 4; form.add(new JLabel("Comisiones: "), gbc);
 		gbc.gridx = 1;
 		txtComisiones = numberField();
 		form.add(this.txtComisiones, gbc);
 		
-		//Fila 5 : Envio
+		// Fila 5 : Envio
 		gbc.gridx = 0; gbc.gridy = 5; form.add( new JLabel("Envio: "), gbc);
 		gbc.gridx = 1;
 		txtEnvio = numberField();
 		form.add(this.txtEnvio, gbc);
 		
-		//Fila 6 : Impuestos
+		// Fila 6 : Impuestos
 		gbc.gridx = 0; gbc.gridy = 6; form.add(new JLabel("Impuestos: "), gbc);
 		gbc.gridx = 1;
 		txtImpuestos = numberField();
@@ -130,7 +128,7 @@ public class DialogVenta extends JDialog{
 		
 		this.add(form, BorderLayout.CENTER);
 		
-		//Barra de botones
+		// Barra de botones
 		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton btnGuardar = new JButton("Guardar");
 		JButton btnCancelar = new JButton("Cancelar");
@@ -138,7 +136,7 @@ public class DialogVenta extends JDialog{
 		buttons.add(btnGuardar);
 		this.add(buttons, BorderLayout.SOUTH);
 		
-		//Acciones basicas
+		// Acciones basicas
 		btnCancelar.addActionListener(e -> {
 			result = null;
 			dispose();
@@ -149,7 +147,7 @@ public class DialogVenta extends JDialog{
 		
 	}
 	
-	//Utilidad para los numeros
+	// Utilidad para los numeros
 	private JFormattedTextField numberField() {
 			java.text.NumberFormat nf = java.text.NumberFormat.getNumberInstance();
 			nf.setGroupingUsed(false); //sin separador de miles para evitar problemas
@@ -159,7 +157,7 @@ public class DialogVenta extends JDialog{
 			return f;
 	}
 	
-	//Comprueba con el onsave que los campos son validos
+	// Comprueba con el onSave que los campos son validos
 	private void onSave() {
 		// Leer y validar el item
 		long itemId;
@@ -172,7 +170,7 @@ public class DialogVenta extends JDialog{
 			return;
 		}
 		
-		//Leer y validar fecha
+		// Leer y validar fecha
 		java.time.LocalDate fecha;
 		try {
 			fecha = java.time.LocalDate.parse(
@@ -185,10 +183,10 @@ public class DialogVenta extends JDialog{
 			return;
 		}
 		
-		//Canal
+		// Canal
 		Canal canal = (Canal) cbCanal.getSelectedItem();
 		
-		//Cantidades numericas
+		// Cantidades numericas
 		double precio = getDouble(txtPrecio, "Precio de venta");
 		if( precio < 0 ) {txtPrecio.requestFocus(); return; }
 		double comisiones = getDouble(txtComisiones, "Comisiones");
@@ -198,7 +196,7 @@ public class DialogVenta extends JDialog{
 		double impuestos = getDouble(txtImpuestos, "Impuestos");
 		if( impuestos < 0 ) {txtImpuestos.requestFocus(); return; }
 		
-		//Coherencia de precios
+		// Coherencia de precios
 		double costes = comisiones + envio + impuestos;
 		if (precio < costes) {
 			int r = JOptionPane.showConfirmDialog(
@@ -211,16 +209,15 @@ public class DialogVenta extends JDialog{
 			if(r != JOptionPane.YES_OPTION) return;
 		}
 		
-		//Construye la Sale
+		// Construye la Sale
 		long idVenta = System.currentTimeMillis(); // en BBDD será AUTOINCREMENT
 	    result = new Sale(idVenta, itemId, fecha, canal, precio, comisiones, envio, impuestos);	
 	    
-	    //Cierra el dialogo
+	    // Cierra el dialogo
 	    dispose();
-}
+	}
 	
-	//Helpers para leer numeros y mostrar avisos
-	
+	// Helpers para leer numeros y mostrar avisos
 	private double getDouble(JFormattedTextField f, String nombreCampo) {
 	    try {
 			f.commitEdit(); //Asegura que toma el valor escrito

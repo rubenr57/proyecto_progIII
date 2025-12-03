@@ -78,7 +78,6 @@ public class DialogItem extends JDialog {
 	}
 	
 	
-	
 	//Metodo que configura el dialogo
 	private void initUI() {
 		this.setLayout(new BorderLayout(8,8));
@@ -231,4 +230,4 @@ public class DialogItem extends JDialog {
 	public Item getResult() {
 		return result;
 	}
-}	
+}
