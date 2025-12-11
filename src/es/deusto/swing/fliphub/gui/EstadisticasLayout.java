@@ -281,11 +281,42 @@ public class EstadisticasLayout extends JPanel{
 		return p;
 	}
 	
-	//Metodo que se llma cuando se actualizan los datos de inventario o ventas
+	//Metodo que se llama cuando se actualizan los datos de inventario o ventas
 	//Actualiza los KPIs y la tabla mensual
 	public void refresh() {
-		calcKPIs();
-		fillMonthlyTable();
+	    calcKPIs();
+	    fillMonthlyTable();
+	}
+	
+	public void refreshHilos() {
+		//añado un metodo que implementa hilos, para poder calcular 
+		//estadisticas en segundo plano sin bloquear la interfaz
+		
+		//limpio para que se vea mejor
+		lblBeneficioTotal.setText("...");
+		lblTicketMedio.setText("...");
+	    lblVendidosPct.setText("...");
+	    lblItemsVendidos.setText("...");
+	    
+	    //Hago un SwingWorker
+	    new javax.swing.SwingWorker<Void, Void>(){
+	    	
+	    	@Override
+	    	protected Void doInBackground() throws Exception {
+	    		
+	    		//Simulamos trabajo en segundo plano
+	    		Thread.sleep(150);
+	    		return null;
+	    		
+	    	}
+	    	
+	    	@Override
+	    	protected void done() {
+	    		//llamamos al refresh() para actualizar la UI
+	    		refresh();
+	    	}
+	    	
+	    }.execute();
 	}
 	
 	//Calculo de los KPIs
@@ -411,5 +442,7 @@ public class EstadisticasLayout extends JPanel{
 	    }
 	    return -1;
 	}
+	
+	
 	
 }

@@ -1,5 +1,6 @@
 package es.deusto.swing.fliphub.gui;
 
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -18,6 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import es.deusto.swing.fliphub.util.AutoSaveService;
+
+
+
+
 
 public class JFramePrincipal extends JFrame {
 
@@ -45,6 +52,7 @@ public class JFramePrincipal extends JFrame {
 	private JLabel statusLabel; //la barra de estados
 	private InventarioLayout inventarioPanel; //Vista del inventario
 	private VentasLayout ventasPanel; //Vista de las ventas
+	private AutoSaveService autosaveService; //hilo de autosave
 	
 	//Constructor 
 	public JFramePrincipal() {
@@ -99,24 +107,61 @@ public class JFramePrincipal extends JFrame {
 		ventasPanel = new VentasLayout();
 		inventarioPanel = new InventarioLayout();
 		inventarioPanel.setVentasLayoutRef(ventasPanel);
+		
+		//cargo los datos desde la BD a los modelos de la tablas
+		es.deusto.swing.fliphub.db.Persistencia.cargarEnModelos(
+				inventarioPanel.getModel(),
+		        ventasPanel.getModel()
+				);
+		
+		//creo el panel de estadisticas con los modelos ya cargados
 		EstadisticasLayout estadisticasPanel = new EstadisticasLayout(inventarioPanel, ventasPanel);
         
         cards.add(inventarioPanel, CARD_INV);
         cards.add(ventasPanel, CARD_VEN);
         cards.add(estadisticasPanel, CARD_EST);
         
+        //creo el autosave cada 10 segundos
+        autosaveService = new AutoSaveService(inventarioPanel, ventasPanel, 10_000);
+        autosaveService.start();
+        
         // Refrescar estadísticas cuando cambien ventas o inventario
-        ventasPanel.getModel().addTableModelListener(e -> estadisticasPanel.refresh());
-        inventarioPanel.getModel().addTableModelListener(e -> estadisticasPanel.refresh());
+        ventasPanel.getModel().addTableModelListener(e -> estadisticasPanel.refreshHilos());
+        inventarioPanel.getModel().addTableModelListener(e -> estadisticasPanel.refreshHilos());
         
         // Primer cálculo al arrancar
-        estadisticasPanel.refresh();
+        estadisticasPanel.refreshHilos();
         
         //Barra de estados Sur
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(new EmptyBorder(6,12,6,12));
         statusLabel = new JLabel("Items: 0 | En stock: 0 | Beneficio mes: 0€");
         statusBar.add(statusLabel, BorderLayout.WEST);
+        
+        //Panel de botones para el autosave
+        JButton btnPausarAutosave = new JButton("Pausar autosave");
+        JButton btnReanudarAutosave = new JButton("Reanudar autosave");
+        
+        JPanel autosavePanel = new JPanel();
+        autosavePanel.add(btnPausarAutosave);
+        autosavePanel.add(btnReanudarAutosave);
+        
+        statusBar.add(autosavePanel, BorderLayout.EAST);
+        
+        btnPausarAutosave.addActionListener(e -> {
+        	if (autosaveService != null) {
+        			autosaveService.pauseAutosave();
+        			statusLabel.setText("Autosave pausado");
+        	}
+        });
+        
+        btnReanudarAutosave.addActionListener(e -> {
+        	if (autosaveService != null) {
+        		autosaveService.resumeAutosave();
+        		statusLabel.setText("Autosave activo");
+        	}
+        });
+        
         
         //Añade todas las partes al FRAME
         this.add(topBar, BorderLayout.NORTH);
@@ -127,7 +172,7 @@ public class JFramePrincipal extends JFrame {
         //Acciones de navegacion
         btnInventario.addActionListener(e -> showCard(CARD_INV));
         btnVentas.addActionListener(e -> showCard(CARD_VEN));
-        btnEstadisticas.addActionListener(e -> showCard(CARD_EST));
+        btnEstadisticas.addActionListener(e -> {showCard(CARD_EST); estadisticasPanel.refreshHilos();});
 	}
 	
 	//METODO BINDSACTIONS -> CONECTAR ACCIONES 
