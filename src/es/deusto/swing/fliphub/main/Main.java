@@ -4,6 +4,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import es.deusto.swing.fliphub.db.Persistencia;
 import es.deusto.swing.fliphub.gui.JFramePrincipal;
 
 public class Main {
@@ -11,6 +12,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
+		
+		//Inicializar la BD
+		Persistencia.initDatabase();
 		
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
