@@ -1,9 +1,12 @@
 package es.deusto.swing.fliphub.main;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import es.deusto.swing.fliphub.db.Persistencia;
+import es.deusto.swing.fliphub.gui.DialogLogin;
 import es.deusto.swing.fliphub.gui.JFramePrincipal;
 
 public class Main {
@@ -11,6 +14,9 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
+		
+		//Inicializar la BD
+		Persistencia.initDatabase();
 		
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -22,7 +28,18 @@ public class Main {
 
         // Lanza la UI
         SwingUtilities.invokeLater(() -> {
-            new JFramePrincipal(); // El constructor ya hace setVisible(true)ç
+        	JFrame dummy = new JFrame();
+            dummy.setUndecorated(true);
+            dummy.setLocationRelativeTo(null);
+
+            DialogLogin login = new DialogLogin(dummy);
+            login.setVisible(true);
+
+            if (login.isOk()) {
+                new JFramePrincipal();
+            } else {
+                System.exit(0);
+            }
             
         });
 	}

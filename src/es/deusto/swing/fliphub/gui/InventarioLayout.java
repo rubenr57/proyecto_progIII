@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -126,6 +128,34 @@ public class InventarioLayout extends JTable {
 				return c;
 			}
 		};
+		
+		//Atajos de teclado
+		table.addKeyListener(new KeyAdapter() {
+		    @Override
+		    public void keyPressed(KeyEvent e) {
+
+		        int row = table.getSelectedRow();
+		        if (row == -1) return; // no hay selección
+
+		        // SUPR: eliminar item
+		        if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+		            int modelRow = table.convertRowIndexToModel(row);
+		            model.removeRow(modelRow);
+		        }
+
+		        // ENTER: editar item
+		        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+		            int modelRow = table.convertRowIndexToModel(row);
+
+		            JFrame parent = (JFrame) javax.swing.SwingUtilities.getWindowAncestor(table);
+
+		            DialogItem dlg = new DialogItem(parent);
+		            dlg.setVisible(true);
+		        }
+		    }
+		});
+		
+		
 		
 		//Listeners para el hoverRow
 		table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -428,6 +458,29 @@ public class InventarioLayout extends JTable {
 	//Metodo para que EstadisticasLayout pueda leer los datos
 	public javax.swing.table.DefaultTableModel getModel(){
 		return model;
+	}
+	
+	//metodos para los atajos de teclado
+	public void deleteSelectedItem() {
+		int row = table.getSelectedRow();
+		if ( row == -1) {
+			return;
+		}
+		int modelRow = table.convertRowIndexToModel(row);
+	    model.removeRow(modelRow);
+	}
+	
+	public void editSelectedItem() {
+	    int row = table.getSelectedRow();
+	    if (row == -1) return;
+
+	    int modelRow = table.convertRowIndexToModel(row);
+
+	    //DialogItem existente
+	    DialogItem dlg = new DialogItem(
+	            (JFrame) javax.swing.SwingUtilities.getWindowAncestor(this)
+	    );
+	    dlg.setVisible(true);
 	}
 	
 }

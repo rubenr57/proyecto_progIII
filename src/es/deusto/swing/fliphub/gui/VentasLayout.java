@@ -6,6 +6,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -125,6 +127,23 @@ public class VentasLayout extends JTable {
 			}
 		};
 		
+		//Atajo de teclado
+		table.addKeyListener(new KeyAdapter() {
+
+		    @Override
+		    public void keyPressed(KeyEvent e) {
+
+		        int row = table.getSelectedRow();
+		        if (row == -1) return;
+
+		        // SUPR: eliminar venta
+		        if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+		            int modelRow = table.convertRowIndexToModel(row);
+		            model.removeRow(modelRow);
+		        }
+		    }
+		});
+		
 		//Listeners para el hoverRow
 		table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
 			@Override
@@ -237,5 +256,14 @@ public class VentasLayout extends JTable {
 	//Metodo para que EstadisticasLayout pueda leer los datos
 	public javax.swing.table.DefaultTableModel getModel(){
 		return model;
+	}
+	
+	//metodo para el atajo de teclado
+	public void deleteSelectedSale() {
+	    int row = table.getSelectedRow();
+	    if (row == -1) return;
+
+	    int modelRow = table.convertRowIndexToModel(row);
+	    model.removeRow(modelRow);
 	}
 }
