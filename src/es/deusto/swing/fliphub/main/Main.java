@@ -6,7 +6,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import es.deusto.swing.fliphub.db.Persistencia;
+<<<<<<< HEAD
 import es.deusto.swing.fliphub.gui.DialogLogin;
+=======
+>>>>>>> branch 'main' of https://github.com/rubenr57/proyecto_progIII.git
 import es.deusto.swing.fliphub.gui.JFramePrincipal;
 
 public class Main {

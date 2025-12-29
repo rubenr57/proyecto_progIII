@@ -33,6 +33,12 @@ import es.deusto.swing.fliphub.util.AutoSaveService;
 
 
 
+import es.deusto.swing.fliphub.util.AutoSaveService;
+
+
+
+
+
 public class JFramePrincipal extends JFrame {
 
 	
@@ -60,9 +66,12 @@ public class JFramePrincipal extends JFrame {
 	private InventarioLayout inventarioPanel; //Vista del inventario
 	private VentasLayout ventasPanel; //Vista de las ventas
 	private AutoSaveService autosaveService; //hilo de autosave
+<<<<<<< HEAD
 	
 	private int numIcons = 0;
 
+=======
+>>>>>>> branch 'main' of https://github.com/rubenr57/proyecto_progIII.git
 	
 	//Constructor 
 	public JFramePrincipal() {
@@ -201,7 +210,10 @@ public class JFramePrincipal extends JFrame {
         // Refrescar estadísticas cuando cambien ventas o inventario
         ventasPanel.getModel().addTableModelListener(e -> estadisticasPanel.refreshHilos());
         inventarioPanel.getModel().addTableModelListener(e -> estadisticasPanel.refreshHilos());
+<<<<<<< HEAD
         
+=======
+>>>>>>> branch 'main' of https://github.com/rubenr57/proyecto_progIII.git
         
         // Primer cálculo al arrancar
         estadisticasPanel.refreshHilos();
@@ -247,6 +259,31 @@ public class JFramePrincipal extends JFrame {
         });
         
         
+        //Panel de botones para el autosave
+        JButton btnPausarAutosave = new JButton("Pausar autosave");
+        JButton btnReanudarAutosave = new JButton("Reanudar autosave");
+        
+        JPanel autosavePanel = new JPanel();
+        autosavePanel.add(btnPausarAutosave);
+        autosavePanel.add(btnReanudarAutosave);
+        
+        statusBar.add(autosavePanel, BorderLayout.EAST);
+        
+        btnPausarAutosave.addActionListener(e -> {
+        	if (autosaveService != null) {
+        			autosaveService.pauseAutosave();
+        			statusLabel.setText("Autosave pausado");
+        	}
+        });
+        
+        btnReanudarAutosave.addActionListener(e -> {
+        	if (autosaveService != null) {
+        		autosaveService.resumeAutosave();
+        		statusLabel.setText("Autosave activo");
+        	}
+        });
+        
+        
         //Añade todas las partes al FRAME
         this.add(topBar, BorderLayout.NORTH);
         this.add(leftNav, BorderLayout.WEST);
@@ -264,11 +301,14 @@ public class JFramePrincipal extends JFrame {
         btnInventario.addActionListener(e -> showCard(CARD_INV));
         btnVentas.addActionListener(e -> showCard(CARD_VEN));
         btnEstadisticas.addActionListener(e -> {showCard(CARD_EST); estadisticasPanel.refreshHilos();});
+<<<<<<< HEAD
         
         //Recursividad 
         numIcons = Recursividad.countImagesRecursive(new File("resources/images"));
         System.out.println("[Recursividad] Iconos encontrados: " + numIcons);
 
+=======
+>>>>>>> branch 'main' of https://github.com/rubenr57/proyecto_progIII.git
 	}
 	
 
